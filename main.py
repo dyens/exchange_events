@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import argparse
 import os
 import re
@@ -27,8 +29,8 @@ def datetime_type(string):
 
 
 parser = argparse.ArgumentParser(description='Exchange events')
-parser.add_argument('start', help='start events', type=datetime_type)
-parser.add_argument('end', help='end events', type=datetime_type)
+parser.add_argument('start', help='start events YYYY-MM-DDThh:mm:ss', type=datetime_type)
+parser.add_argument('end', help='end events YYYY-MM-DDThh:mm:ss', type=datetime_type)
 parser.add_argument('emails', nargs='+', type=email_type)
 
 
@@ -52,7 +54,7 @@ def get_events(emails, start, end):
                           end.second)
         evs = account.calendar.view(
             start=tz.localize(start), end=tz.localize(end))
-        events[email] = evs
+        events[email] = (i for i in evs)
     return events
 
 
@@ -79,4 +81,8 @@ if __name__ == '__main__':
     end=args.end
     emails = args.emails
     events = get_events(emails, start, end)
-    print_event(events)
+    for email, event_list in events.items():
+        print(email, ':')
+        for ev in event_list:
+            print_event(ev)
+        print('------------------------------')
